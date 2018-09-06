@@ -8,15 +8,15 @@ struct pessoa{
 typedef struct pessoa P;
 
 struct variaveis{
-	int i;
+	int i,nPessoas;
 	};
 typedef struct variaveis var;
 
 void menu(var *p);
-void incluiP(void *pB);
+void incluiP(void **pB);
 void apagaP();
 void buscaP();
-void listaP(void *pB);
+void listaP(void **pB);
 
 int main(){
 	void *pBuffer;
@@ -27,12 +27,14 @@ int main(){
 		exit(1);
 	}
 	p=pBuffer;
+	p->nPessoas=0;
+	//printf("sizeof(int)=%d\nsizeof(float)=%d\nsizeof(char)=%d\n",sizeof(int),sizeof(float),sizeof(char));
 	while(1){
 		menu(p);
 		switch (p->i) {
 			case 1:
-				incluiP(pBuffer);
-				break; 
+				incluiP(&pBuffer);
+				break;
 			case 2:
 				printf("apagaP()");
 				break;
@@ -40,7 +42,7 @@ int main(){
 				printf("buscaP()");
 				break;
 			case 4:
-				listaP(pBuffer);
+				listaP(&pBuffer);
 				break;
 			default:
 				printf("Erro no menu!\n");
@@ -56,16 +58,29 @@ void menu(var *p){
 	scanf("%d",&(p->i));
 }
 
-void incluiP(void *pB){
+void incluiP(void **pB){
 	P *aux;
-	pB=realloc(pB,1*sizeof(var)+1*sizeof(P));
-	aux=(pB+sizeof(int));
+	void *p;
+	var *i;
+
+	i = *pB;
+	i->nPessoas++;
+	*pB=realloc(*pB,1*sizeof(var)+i->nPessoas*sizeof(P));
+	i=*pB;
+	p=*pB + sizeof(var) + (i->nPessoas-1)*sizeof(P);
+	aux=p;
 	printf("Nome e idade:\n");
-	scanf("%s %d",aux->nome,&(aux->idade));	
+	scanf("%s %d",aux->nome,&(aux->idade));
 	}
 
-void listaP(void *pB){
+void listaP(void **pB){
 	P *aux;
-	aux=(pB+sizeof(int));
-	printf("Nome:%s\nIdade:%d\n",aux->nome,aux->idade);
+	void *p;
+	var *i;
+	i=*pB;
+	for(i->i=0;i->i < i->nPessoas;(i->i)++){
+        p=*pB + sizeof(var) + i->i*sizeof(P);
+        aux=p;
+        printf("Nome:%s\nIdade:%d\n",aux->nome,aux->idade);
+        }
 	}
