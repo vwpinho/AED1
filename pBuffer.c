@@ -1,23 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+struct data{
+    int dia,mes,ano;
+};
+typedef struct data D;
 struct pessoa{
-	int idade;
+	D niver;
 	char nome[20];
+        char email[30];
+        int telefone;
 };
 typedef struct pessoa P;
 
 struct variaveis{
-	int i,nPessoas;
+	int i,nPessoas,flag,j;
+        char busca[20], cmp[20];
 	};
 typedef struct variaveis var;
 
 void menu(var *p);
 void incluiP(void **pB);
-void apagaP();
-void buscaP();
+void apagaP(void **pB, char *nome);
+void buscaP(void **pB);
 void listaP(void **pB);
-
+void cortaString(char* s,int n,void **pB);
 int main(){
 	void *pBuffer;
 	var *p;
@@ -36,10 +44,12 @@ int main(){
 				incluiP(&pBuffer);
 				break;
 			case 2:
-				printf("apagaP()");
+				printf("Nome da pessoa:");
+                                scanf("%s",p->busca);
+                                apagaP(&pBuffer,p->busca);
 				break;
 			case 3:
-				printf("buscaP()");
+				buscaP(&pBuffer);
 				break;
 			case 4:
 				listaP(&pBuffer);
@@ -54,7 +64,7 @@ int main(){
 }
 
 void menu(var *p){
-	printf("1.Incluir pessoa\n2.Apagar pessoa\n3.Buscar pessoa\n4.Listar");
+	printf("1.Incluir pessoa\n2.Apagar pessoa\n3.Buscar pessoa\n4.Listar\n");
 	scanf("%d",&(p->i));
 }
 
@@ -69,8 +79,9 @@ void incluiP(void **pB){
 	i=*pB;
 	p=*pB + sizeof(var) + (i->nPessoas-1)*sizeof(P);
 	aux=p;
-	printf("Nome e idade:\n");
-	scanf("%s %d",aux->nome,&(aux->idade));
+	printf("Nome, aniversario, email e telefone:\n");
+	scanf("%s %d %d %d",aux->nome,&(aux->niver.dia),&(aux->niver.mes),&(aux->niver.ano));
+        scanf("%s %d",aux->email,&(aux->telefone));
 	}
 
 void listaP(void **pB){
@@ -81,6 +92,103 @@ void listaP(void **pB){
 	for(i->i=0;i->i < i->nPessoas;(i->i)++){
         p=*pB + sizeof(var) + i->i*sizeof(P);
         aux=p;
-        printf("Nome:%s\nIdade:%d\n",aux->nome,aux->idade);
+        printf("Nome:%s\nAniversario:%d/%d/%d\nEmail:%s\nTelefone:%d\n",aux->nome,aux->niver.dia,aux->niver.mes,aux->niver.ano,aux->email,aux->telefone);
         }
 	}
+void buscaP(void **pB)
+{
+    P *aux;
+    var *i;
+    void *p;
+    
+    i=*pB;
+    printf("Digite um nome para busca:");
+    scanf("%s",i->busca);
+    i->flag=0;
+    for(i->i=0;i->i < i->nPessoas;(i->i)++)
+    {
+        p=*pB + sizeof(var) + i->i*sizeof(P);
+        aux = p;
+        
+        cortaString(aux->nome,(int)strlen(i->busca),pB);
+        printf("DEBUG:Sb:%s\tLen:%zd\tSb:%s\n",i->busca,strlen(i->busca),i->cmp);
+        if(strcmp(i->busca,i->cmp) == 0)
+        {
+            printf("Pessoa encontrada!\n");
+            printf("Nome:%s\nAniversario:%d/%d/%d\nEmail:%s\nTelefone:%d\n",aux->nome,aux->niver.dia,aux->niver.mes,aux->niver.ano,aux->email,aux->telefone);
+            printf("Deseja exclui-la?[1.Sim / 2.Nao]\n");
+            scanf("%d",&(i->flag));
+            if(i->flag==1)
+            {
+                apagaP(pB,aux->nome);
+            }
+            break;
+        }
+    }
+    if(!(i->flag))
+    {
+        printf("Pessoa não encontrada!\n");
+    }
+
+}
+void cortaString(char* s,int n,void **pB)
+{
+    var *i;
+    
+    i=*pB;
+    strcpy(i->cmp,"");
+    printf("Funcao corta, n:%d\n",n);
+    for(i->j=0; i->j < n;i->j++)
+    {
+        i->cmp[i->j]=s[i->j];
+    }
+    i->cmp[n]='\0';
+}
+void apagaP(void **pB, char *nome)
+{
+    P *aux,*anterior;
+    var *i;
+    void *p;
+    
+    i=*pB;
+    i->flag=0;
+    for(i->i=0;i->i < i->nPessoas;(i->i)++)
+    {
+        p=*pB + sizeof(var) + i->i*sizeof(P);
+        aux = p;
+        if(strcmp(aux->nome,nome)==0)
+        {
+            printf("Tem certeza que deseja excluir %s da agenda? [1.SIM / 2.NAO]?\n",nome);
+            scanf("%d",&(i->flag));
+            if(i->flag==1)
+            {
+               for(i->j=i->i; i->j < i->nPessoas-1; i->j++)
+               {
+                   p=*pB + sizeof(var) + i->j*sizeof(P);
+                   anterior = p;
+                   p=*pB + sizeof(var) + (i->j+1)*sizeof(P);
+                   aux = p;
+                   *anterior=*aux;
+               }
+               printf("Pessoa deletada!\n");
+               i->nPessoas--;
+               *pB=realloc(*pB,1*sizeof(var)+i->nPessoas*sizeof(P));
+            }
+            if(i->flag==2)
+            {
+                printf("Exclusao abortada!\n");
+            }
+        }
+    }
+    if(i->flag==0)
+    {
+        printf("Pessoa não encontrada!\n");
+    }
+}
+/* Aprimoramentos futuro:
+ * Na busca por pessoas, mostrar todas em que o nome começa com os caracteres 
+ * digitados
+ * Criar uma sequencia numerica para as pessoas, gerada automaticamente,
+ * e mostra-la na lista para facilitar a exclusao de pessoas
+ * Lista e Incluir pessoa por enquanto atendem suas funcoes
+ */
