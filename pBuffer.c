@@ -16,7 +16,8 @@ typedef struct pessoa P;
 
 struct variaveis{
 	int i,nPessoas,flag,j;
-        char busca[20], cmp[20],tmp[20];
+        char busca[20], cmp[20];
+        P tmp;
 	};
 typedef struct variaveis var;
 
@@ -26,7 +27,7 @@ void apagaP(void **pB, char *nome);
 void buscaP(void **pB);
 void listaP(void **pB);
 void cortaString(char* s,int n,void **pB);
-void Insertionsort (void **pB, int n);
+void Insertionsort (void **pB);
 int main(){
 	void *pBuffer;
 	var *p;
@@ -55,6 +56,9 @@ int main(){
 			case 4:
 				listaP(&pBuffer);
 				break;
+                        case 5:
+                                Insertionsort(&pBuffer);
+                                break;
 			default:
 				printf("Erro no menu!\n");
 				free(pBuffer);
@@ -65,7 +69,7 @@ int main(){
 }
 
 void menu(var *p){
-	printf("1.Incluir pessoa\n2.Apagar pessoa\n3.Buscar pessoa\n4.Listar\n");
+	printf("1.Incluir pessoa\n2.Apagar pessoa\n3.Buscar pessoa\n4.Listar\n5.Ordenar\n");
 	scanf("%d",&(p->i));
 }
 
@@ -186,21 +190,29 @@ void apagaP(void **pB, char *nome)
         printf("Pessoa não encontrada!\n");
     }
 }
-void Insertionsort (void **pB, int n) { 
+void Insertionsort (void **pB) { 
         var *i;
         void *p;
-        P *aux;
-        i=*pB;
-        for (i->j=1; i->j<n; i->j++) { 
+        P *aux,*proximo;
+        i = *pB;
+        for (i->j=1; i->j < i->nPessoas; i->j++) { 
 		i->i =i->j - 1;
-                aux =(P*) *pB + sizeof(var) + i->j*sizeof(P);
-		i->tmp = aux->nome;                              //Tipo do tmp tem que ser o mesmo tipo da variavel que queremos ordenar
-		while ( (i->i>=0) && (i->tmp < data[i->i]) ) { //Modificar da[i+1]
-			data[i->i+1] = data[i->i];
-			 i->i--; 
+                p = *pB + sizeof(var) + i->j*sizeof(P);
+		aux = p;
+                i->tmp = *aux;                      // Segunda pessoa
+		p =  *pB + sizeof(var) + i->i*sizeof(P);
+                aux = p;                            // Primeira pessoa
+                while ( (i->i >= 0) && ((strcmp(i->tmp.nome,aux->nome)<0)) ) { 
+                        p = *pB + sizeof(var) + (i->i+1)*sizeof(P);
+                        proximo = p; 
+                        *proximo = *aux;            // Segundo recebe primeiro
+                        i->i--; 
+                        p = *pB + sizeof(var) + i->i*sizeof(P);
+                        aux = p;
 		}//while
-
-		data[i->i+1] = i->tmp; 
+                p = *pB + sizeof(var) + (i->i+1)*sizeof(P);
+		proximo = p;
+                *proximo = i->tmp; 
 	}//for
  }//Insertionsort
 
