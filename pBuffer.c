@@ -15,9 +15,9 @@ struct pessoa{
 typedef struct pessoa P;
 
 struct variaveis{
-	int i,nPessoas,flag,j;
+	int i,nPessoas,flag,j,min_id;
         char busca[20], cmp[20];
-        P tmp;
+        P tmp,min;
 	};
 typedef struct variaveis var;
 
@@ -28,6 +28,8 @@ void buscaP(void **pB);
 void listaP(void **pB);
 void cortaString(char* s,int n,void **pB);
 void Insertionsort (void **pB);
+void Selectsort (void **pB);
+void menuOrdem ();
 int main(){
 	void *pBuffer;
 	var *p;
@@ -57,7 +59,13 @@ int main(){
 				listaP(&pBuffer);
 				break;
                         case 5:
-                                Insertionsort(&pBuffer);
+                                printf("\n1.Insertion Sort\n2.Selection Sort\n");
+                                scanf("%d",&(p->j));
+                                if(p->j==1)
+                                    Insertionsort(&pBuffer);
+                                if(p->j==2)
+                                    Selectsort(&pBuffer);
+                                
                                 break;
 			default:
 				printf("Erro no menu!\n");
@@ -84,7 +92,7 @@ void incluiP(void **pB){
 	i=*pB;
 	p=*pB + sizeof(var) + (i->nPessoas-1)*sizeof(P);
 	aux=p;
-	printf("Nome, aniversario, email e telefone:\n");
+	printf("\nNome, aniversario, email e telefone:\n");
 	scanf("%s %d %d %d",aux->nome,&(aux->niver.dia),&(aux->niver.mes),&(aux->niver.ano));
         scanf("%s %d",aux->email,&(aux->telefone));
 	}
@@ -97,7 +105,7 @@ void listaP(void **pB){
 	for(i->i=0;i->i < i->nPessoas;(i->i)++){
         p=*pB + sizeof(var) + i->i*sizeof(P);
         aux=p;
-        printf("Nome:%s\nAniversario:%d/%d/%d\nEmail:%s\nTelefone:%d\n",aux->nome,aux->niver.dia,aux->niver.mes,aux->niver.ano,aux->email,aux->telefone);
+        printf("\nNome:%s\nAniversario:%d/%d/%d\nEmail:%s\nTelefone:%d\n",aux->nome,aux->niver.dia,aux->niver.mes,aux->niver.ano,aux->email,aux->telefone);
         }
 	}
 void buscaP(void **pB)
@@ -107,7 +115,7 @@ void buscaP(void **pB)
     void *p;
     
     i=*pB;
-    printf("Digite um nome para busca:");
+    printf("\nDigite um nome para busca:");
     scanf("%s",i->busca);
     i->flag=0;
     for(i->i=0;i->i < i->nPessoas;(i->i)++)
@@ -116,7 +124,7 @@ void buscaP(void **pB)
         aux = p;
         
         cortaString(aux->nome,(int)strlen(i->busca),pB);
-        printf("DEBUG:Sb:%s\tLen:%zd\tSb:%s\n",i->busca,strlen(i->busca),i->cmp);
+        printf("\nDEBUG:Sb:%s\tLen:%zd\tSb:%s\n",i->busca,strlen(i->busca),i->cmp);
         if(strcmp(i->busca,i->cmp) == 0)
         {
             printf("Pessoa encontrada!\n");
@@ -215,6 +223,34 @@ void Insertionsort (void **pB) {
                 *proximo = i->tmp; 
 	}//for
  }//Insertionsort
+    void Selectsort (void **pB) {
+       var *i;
+       void *p;
+       P *data,*aux;
+       i = *pB;
+       for (i->i=0; i->i < (i->nPessoas-1); i->i++) { 
+            i->min_id = i->i;
+            p = *pB + sizeof(var) + (i->i)*sizeof(P);
+            data = p;
+            i->min = *data; 
+            for (i->j=(i->i+1); i->j<i->nPessoas; i->j++) {
+                p = *pB + sizeof(var) + (i->j)*sizeof(P);
+                data = p;
+                if (strcmp(data->nome,i->min.nome)<0) { 
+                    i->min = *data; 
+                    i->min_id = i->j; 
+                    } 
+                }
+            p = *pB + sizeof(var) + (i->i)*sizeof(P);
+            data = p;
+            i->tmp = *data; 
+            p = *pB + sizeof(var) + (i->min_id)*sizeof(P);
+            aux = p;
+            *data = *aux; 
+            *aux = i->tmp;
+        } 
+    }
+
 
 /* Aprimoramentos futuro:
  * Na busca por pessoas, mostrar todas em que o nome começa com os caracteres 
