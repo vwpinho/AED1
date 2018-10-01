@@ -16,7 +16,7 @@ typedef struct pessoa P;
 
 struct variaveis{
 	int i,nPessoas,flag,j;
-        char busca[20], cmp[20];
+        char busca[20], cmp[20],tmp[20];
 	};
 typedef struct variaveis var;
 
@@ -26,6 +26,7 @@ void apagaP(void **pB, char *nome);
 void buscaP(void **pB);
 void listaP(void **pB);
 void cortaString(char* s,int n,void **pB);
+void Insertionsort (void **pB, int n);
 int main(){
 	void *pBuffer;
 	var *p;
@@ -185,6 +186,24 @@ void apagaP(void **pB, char *nome)
         printf("Pessoa não encontrada!\n");
     }
 }
+void Insertionsort (void **pB, int n) { 
+        var *i;
+        void *p;
+        P *aux;
+        i=*pB;
+        for (i->j=1; i->j<n; i->j++) { 
+		i->i =i->j - 1;
+                aux =(P*) *pB + sizeof(var) + i->j*sizeof(P);
+		i->tmp = aux->nome;                              //Tipo do tmp tem que ser o mesmo tipo da variavel que queremos ordenar
+		while ( (i->i>=0) && (i->tmp < data[i->i]) ) { //Modificar da[i+1]
+			data[i->i+1] = data[i->i];
+			 i->i--; 
+		}//while
+
+		data[i->i+1] = i->tmp; 
+	}//for
+ }//Insertionsort
+
 /* Aprimoramentos futuro:
  * Na busca por pessoas, mostrar todas em que o nome começa com os caracteres 
  * digitados
