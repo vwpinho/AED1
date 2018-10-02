@@ -29,6 +29,7 @@ void listaP(void **pB);
 void cortaString(char* s,int n,void **pB);
 void Insertionsort (void **pB);
 void Selectsort (void **pB);
+void Bubblesort (void **pB);
 void menuOrdem ();
 int main(){
 	void *pBuffer;
@@ -59,13 +60,14 @@ int main(){
 				listaP(&pBuffer);
 				break;
                         case 5:
-                                printf("\n1.Insertion Sort\n2.Selection Sort\n");
+                                printf("\n1.Insertion Sort\n2.Selection Sort\n3.Bubblesort\n");
                                 scanf("%d",&(p->j));
                                 if(p->j==1)
                                     Insertionsort(&pBuffer);
                                 if(p->j==2)
                                     Selectsort(&pBuffer);
-                                
+                                if(p->j==3)
+                                    Bubblesort(&pBuffer);
                                 break;
 			default:
 				printf("Erro no menu!\n");
@@ -250,6 +252,30 @@ void Insertionsort (void **pB) {
             *aux = i->tmp;
         } 
     }
+    void Bubblesort (void **pB) { 
+	var *i;
+        void *p;
+        P *data,*proximo;
+        i = *pB;
+	for (i->i=0; i->i < (i->nPessoas-1); i->i++) { 
+                i->flag=0;
+		for (i->j=0; i->j < (i->nPessoas - i->i - 1); i->j++) {
+                        p = *pB + sizeof(var) + (i->j)*sizeof(P);
+                        data = p;
+			p = *pB + sizeof(var) + (i->j + 1)*sizeof(P);
+                        proximo = p;
+                        if (strcmp(proximo->nome,data->nome) < 0) { 					
+                            i->tmp = *data; 
+                            *data = *proximo;
+                            *proximo = i->tmp; 
+                            i->flag=1;
+			} 
+		}
+            if(i->flag==0)
+                break;
+	} 
+    }
+
 
 
 /* Aprimoramentos futuro:
