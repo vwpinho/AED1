@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct data{
     int dia,mes,ano;
@@ -17,7 +18,7 @@ typedef struct pessoa P;
 struct variaveis{
 	int i,nPessoas,flag,j,min_id;
         char busca[20], cmp[20];
-        P tmp,min;
+        P tmp,min,mid;
 	};
 typedef struct variaveis var;
 
@@ -30,10 +31,11 @@ void cortaString(char* s,int n,void **pB);
 void Insertionsort (void **pB);
 void Selectsort (void **pB);
 void Bubblesort (void **pB);
+void Quicksort (void **pB, int left, int right);
 void menuOrdem ();
 int main(){
 	void *pBuffer;
-	var *p;
+	var *p,*aux;
 	pBuffer= malloc(1*sizeof(var));
 	if(!pBuffer){
 		printf("Problema ao aloca memoria!");
@@ -60,7 +62,7 @@ int main(){
 				listaP(&pBuffer);
 				break;
                         case 5:
-                                printf("\n1.Insertion Sort\n2.Selection Sort\n3.Bubblesort\n");
+                                printf("\n1.Insertion Sort\n2.Selection Sort\n3.Bubblesort\n4.QuickSort\n");
                                 scanf("%d",&(p->j));
                                 if(p->j==1)
                                     Insertionsort(&pBuffer);
@@ -68,6 +70,9 @@ int main(){
                                     Selectsort(&pBuffer);
                                 if(p->j==3)
                                     Bubblesort(&pBuffer);
+                                if(p->j==4)
+                                    aux = pBuffer;                                    
+                                    Quicksort(&pBuffer,0,aux->nPessoas-1);
                                 break;
 			default:
 				printf("Erro no menu!\n");
@@ -275,8 +280,61 @@ void Insertionsort (void **pB) {
                 break;
 	} 
     }
+    void Quicksort (void **pB, int left, int right){
+        var *i;
+        void *p;
+        P *data,*mid,*aux;
+        i= *pB;
+        if(right-left<1)
+            return;
+        i->i=left;
+        i->j=right;
+        srand(time(NULL));
+        p = *pB + sizeof(var) + (rand()%(right - left))*sizeof(P); 
+        mid = p;
+        do{
+            data = *pB + sizeof(var) + (i->i)*sizeof(P);     
+            while(strcmp(data->nome,mid->nome) < 0){
+                i->i++;
+                data = *pB + sizeof(var) + (i->i)*sizeof(P); 
+            }
+            data = *pB + sizeof(var) + (i->j)*sizeof(P); 
+            while(strcmp(mid->nome,data->nome) < 0){
+                i->j--;
+                data = *pB + sizeof(var) + (i->j)*sizeof(P); 
+            }
+                
+            if(i->i<=i->j){
+                data = *pB + sizeof(var) + (i->i)*sizeof(P); 
+                aux = *pB + sizeof(var) + (i->j)*sizeof(P); 
+                i->tmp= *data;
+                *data = *aux;
+                *aux = i->tmp;
+                i->i++;
+                i->j--;
+            }
+        }while(i->i <= i->j);
+        if(left < i->j)
+            Quicksort(&*pB,left,i->j);
+        if(i->i < right)                    //i->i volta alterado pq nao é uma variavel local 
+            Quicksort(&*pB,i->i,right);
+        
+    }
+    /* Problema:
+     * Funciona na primeira vez
+     * Caso adicionamos mais uma pessoa, occore um erro na organização
+     * -> Resolver usando o debugger 
+     */
 
-
+    void Mergesort(void **pB){
+        var *i;
+        void *p;
+        P *data;
+        i = *pB;
+        if(i->nPessoas <= 1)
+            return;
+        
+    }
 
 /* Aprimoramentos futuro:
  * Na busca por pessoas, mostrar todas em que o nome começa com os caracteres 
